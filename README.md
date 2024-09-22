@@ -150,4 +150,36 @@ Step-by-Step Process:
 
     The client receives the result and displays it to the user in a readable format (line number + line).
 
+Example of Full Flow:
+
+    User Input:
+        User enters default.txt and searches for "Cisco".
+
+    Client Sends Request:
+        Client sends:
+        {
+  "filename": "default.txt",
+  "word": "Cisco"
+}
+Server Receives Request:
+
+    Server accepts the connection.
+    It receives the filename and word, then calls search.py to perform the search.
+
+search.py Finds the Word:
+
+    The getLines() method in search.py searches default.txt and returns:
+    ["Cisco", (1, "Cisco Systems, Inc. is a global leader in networking technology."), (4, "The word Cisco is synonymous with innovation in network technology.")]
+Server Sends the Result Back:
+
+    The server sends this result back to the client.
+
+Client Displays the Result:
+
+    The client prints the result to the user in the following format:
+    Search results for 'Cisco' in 'default.txt':
+Line 1: Cisco Systems, Inc. is a global leader in networking technology.
+Line 4: The word Cisco is synonymous with innovation in network technology.
+
+
 
