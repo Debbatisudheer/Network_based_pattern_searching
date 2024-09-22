@@ -1,50 +1,153 @@
-# cisco_project
-Overview
-========
-•	client.py is the program where the user interacts. It sends a request (filename + search word) to the server.py.
-•	server.py is always running and waiting for requests from client.py. When it gets a request, it uses search.py to find the requested word in the specified file.
-•	search.py contains the logic for finding the word (or pattern) in the file. It processes the file and gives the results back to server.py.
-•	The server.py sends the results back to client.py, which displays the results to the user.
+Project Overview
+================
+Goal:
+-----
 
-Step-by-Step Breakdown
-=====================
-1.	Client (client.py) Sends Request:
-o	The user starts the client and enters:
-	The filename (e.g., default.txt).
-	The word to search (e.g., Cisco).
-o	The client sends this data (filename + word) over the network to the server.
-2.	Server (server.py) Receives Request:
-o	The server listens for incoming requests from the client.
-o	When the server gets a request from the client, it extracts:
-	The filename (default.txt).
-	The word to search (Cisco).
-o	Now, the server needs to search the word in the file. It uses the Search class from search.py to do this.
-3.	Search Logic (search.py) Performs the Search:
-o	The server creates a Search object (from search.py), giving it the filename.
-o	The Search class reads the file and removes special characters (cleans the file).
-o	It then finds all lines that contain the word (e.g., "Cisco") and stores the results in a list.
-4.	Server Sends Results Back to Client:
-o	Once the server gets the search results from search.py, it converts them into a format the client can understand (JSON format).
-o	The server sends the search results back to the client over the network.
-5.	Client Displays Results:
-o	The client receives the search results from the server.
-o	The results (like lines where the word "Cisco" was found) are shown to the user in the terminal.
-Example Interaction
-•	Client (client.py): Sends:
-{
-  "filename": "default.txt",
-  "word": "Cisco"
-}
-•  Server (server.py):
-•	Receives this request.
-•	Uses search.py to find the word "Cisco" in default.txt.
-•  search.py:
-•	Processes the file and finds:
-["Cisco", (1, "Cisco Systems, Inc. is a global leader in networking technology."), (4, "The word Cisco is synonymous with innovation in network technology.")]
-•	Server (server.py): Sends these results back to the client.
-•	Client (client.py): Displays the results to the user.
-In short:
-•	client.py → sends request to server.py.
-•	server.py → uses search.py to find the word and send results back to client.py.
-•	client.py → displays results to the user.
+    Client sends a request (filename + word to search) to the server.
+    Server processes the request by using search.py to find the word in the file.
+    The result (lines containing the word) is sent back to the client.
+    The client displays the result to the user.
+
+Breakdown of the Files
+---------------------
+1. Client (client.py): User Interface and Request Sender
+ ====================================================
+
+This is where the user interacts. The client program asks the user for:
+
+    The name of the file to search (e.g., default.txt).
+    The word or pattern to search for in the file.
+
+Steps the Client Follows:
+
+    Take Input from the User:
+        The client asks the user to provide:
+            The filename (e.g., default.txt).
+            The word they want to search for in that file (e.g., Cisco).
+
+    Establish a Connection to the Server:
+        The client connects to the server using a network socket.
+        Socket: Think of a socket as a phone line that connects two computers, allowing them to send and receive data.
+
+    Send Data to the Server:
+        The client prepares a message (filename + word) in JSON format (a common data format).
+        It sends this data to the server over the socket.
+
+    Receive the Result:
+        After the server processes the request, it sends back the result (list of lines containing the word).
+        The client receives this result.
+
+    Display the Result:
+        The client processes the result and displays it in a readable format to the user.
+
+Example of Client Code Interaction:
+-----------------------------------
+filename = input("Enter the filename (e.g., default.txt): ")
+word = input("Enter the word to search for: ")
+
+# Connect to the server and send the request
+client_socket.connect(("127.0.0.1", 9999))
+client_socket.send(data.encode('utf-8'))  # Send filename and word
+
+# Receive and display the result from the server
+response = client_socket.recv(1024).decode('utf-8')
+
+
+2. Server (server.py): Request Handler and Coordinator
+ ===================================================
+
+The server acts like a middleman. It listens for client connections and handles their requests by using the search.py logic.
+Steps the Server Follows:
+
+    Listen for Connections:
+        The server is continuously running and listening for client connections on a specific port (9999 in this case).
+        Once a client connects, the server accepts the connection and starts handling the request.
+
+    Receive Data from Client:
+        The server receives the filename and word that the client wants to search for.
+
+    Use search.py to Process the Request:
+        The server imports the Search class from search.py.
+        It creates an instance of Search with the provided filename.
+        The server then calls the getLines() method from Search to get the lines containing the word.
+
+    Send the Result Back to the Client:
+        Once the server has the result (lines containing the word), it sends this data back to the client in JSON format.
+        The client will display this data to the user.
+
+Example of Server Code Interaction:
+-----------------------------------
+# Receive filename and word from the client
+data = client_socket.recv(1024).decode('utf-8')
+filename = data.get("filename")
+word = data.get("word")
+
+# Use the Search class to find the word in the file
+search_obj = Search(filename)
+result = search_obj.getLines(word)
+
+# Send the result back to the client
+client_socket.send(response.encode('utf-8'))
+
+How Server Handles Multiple Clients:
+
+    The server is multithreaded, meaning it can handle multiple client requests at the same time. For each new client connection, a new thread is created to handle that client separately. This ensures that multiple users can search for different words at the same time without the server crashing.
+
+
+3. Search Logic (search.py): The Core Logic of Searching
+ ======================================================
+
+This file contains all the logic for reading the file, cleaning the text, and finding the word the user wants to search for. It’s the core engine that drives the search process.
+Steps search.py Follows:
+
+    Read the File:
+        When a Search object is created, it reads the file (e.g., default.txt) and stores each line of the file in a list.
+
+    Clean the File (Optional):
+        The clean() method removes any special characters (like punctuation) from each line. This makes the search process more accurate.
+
+    Search for the Word:
+        The getLines() method takes the word provided by the user and searches for it in the list of lines.
+        It uses a case-insensitive search, meaning it will find the word even if it’s written in different cases (e.g., "Cisco" vs "cisco").
+
+    Return the Result:
+        The getLines() method returns a list of tuples where each tuple contains:
+            The line number.
+            The line that contains the word.
+
+Example of Search Code Interaction:
+----------------------------------
+def getLines(self, word):
+    result = [word]  # Start with the word
+    for idx, line in enumerate(self.lines, 1):
+        if word.lower() in line.lower():  # Case-insensitive search
+            result.append((idx, line.strip()))  # Add line number and line
+    return result  # Return the list of results
+
+Step-by-Step Process:
+======================
+1. Client Starts the Process:
+
+    The client asks the user for the filename and word to search for.
+    It sends this data to the server.
+
+2. Server Receives and Processes the Request:
+
+    The server receives the data (filename + word).
+    It uses the Search class from search.py to search for the word in the specified file.
+
+3. Search Logic is Performed:
+
+    The Search class reads the file and looks for all the lines containing the word.
+    The result is prepared as a list of lines with their line numbers.
+
+4. Server Sends the Result Back:
+
+    Once the search is complete, the server converts the result into JSON format.
+    It sends the JSON data back to the client.
+
+5. Client Displays the Result:
+
+    The client receives the result and displays it to the user in a readable format (line number + line).
+
 
