@@ -11,7 +11,7 @@ Goal:
 Breakdown of the Files
 ---------------------
 1. Client (client.py): User Interface and Request Sender
- ====================================================
+-------------------------------------------------------
 
 This is where the user interacts. The client program asks the user for:
 
@@ -54,7 +54,7 @@ response = client_socket.recv(1024).decode('utf-8')
 
 
 2. Server (server.py): Request Handler and Coordinator
- ===================================================
+------------------------------------------------------
 
 The server acts like a middleman. It listens for client connections and handles their requests by using the search.py logic.
 Steps the Server Follows:
@@ -95,7 +95,7 @@ How Server Handles Multiple Clients:
 
 
 3. Search Logic (search.py): The Core Logic of Searching
- ======================================================
+--------------------------------------------------------
 
 This file contains all the logic for reading the file, cleaning the text, and finding the word the user wants to search for. It’s the core engine that drives the search process.
 Steps search.py Follows:
