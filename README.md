@@ -10,14 +10,14 @@ Step-by-Step Breakdown
 =====================
 1.	Client (client.py) Sends Request:
 o	The user starts the client and enters:
-	The filename (e.g., default.txt).
-	The word to search (e.g., Cisco).
+	The filename (e.g., default.txt).
+	The word to search (e.g., Cisco).
 o	The client sends this data (filename + word) over the network to the server.
 2.	Server (server.py) Receives Request:
 o	The server listens for incoming requests from the client.
 o	When the server gets a request from the client, it extracts:
-	The filename (default.txt).
-	The word to search (Cisco).
+	The filename (default.txt).
+	The word to search (Cisco).
 o	Now, the server needs to search the word in the file. It uses the Search class from search.py to do this.
 3.	Search Logic (search.py) Performs the Search:
 o	The server creates a Search object (from search.py), giving it the filename.
